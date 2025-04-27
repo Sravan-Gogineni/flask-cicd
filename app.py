@@ -138,6 +138,6 @@ def generate_ollama_llama_response(context, query):
     except Exception as e:
         # Add error handling
         return f"Error generating response: {str(e)}"
-"abcd,df,dff"
+"abcd,dfdff"
 if __name__ == "__main__":
     app.run(debug=True)
