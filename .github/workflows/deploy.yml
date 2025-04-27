@@ -20,7 +20,7 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        ssh -i  /home/sravan/Desktop/Projects/rag_system/RAGSYSTEM/rag_server_key.pem -o StrictHostKeyChecking=no ubuntu@54.237.97.48 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ubuntu@54.237.97.48 << 'EOF'
           cd ~/flask-cicd
           git pull origin main
           source venv/bin/activate
