@@ -26,6 +26,8 @@ jobs:
           git pull origin main || { echo "Failed to pull from Git"; exit 1; }
           source venv/bin/activate || { echo "Failed to activate virtual environment"; exit 1; }
           pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
+          sudo systemctl daemon-reload || { echo "Failed to reload systemd"; exit 1; }
           sudo systemctl restart flask-app || { echo "Failed to restart Flask app"; exit 1; }
+          sudo systemctl status flask-app || { echo "Flask app is not running"; exit 1; }
         EOF
 
