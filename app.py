@@ -4,7 +4,7 @@ from pinecone import Pinecone
 from dotenv import load_dotenv
 import os
 import google.generativeai as genai
-
+import requests
 # Load environment variables from .env
 load_dotenv()
 
@@ -13,6 +13,18 @@ app = Flask(__name__)
 
 # Load embedding model
 model = SentenceTransformer("all-MiniLM-L6-v2")
+ollama_url = "http://localhost:11434/api/generate"
+
+headers = { 
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+}
+data = {
+    "model": "llama3",
+    "prompt": "",
+    "stream": False,
+    "stop_sequence": "\n"
+}
 
 # Init Pinecone
 pc = Pinecone(api_key=os.getenv("pinecapikey"))
@@ -75,11 +87,14 @@ def search(query):
 
         # Generate Gemini answer
         gemini_answer = generate_gemini_response(combined_context, query)
+        # Generate Ollama Llama answer
+        llama_answer = generate_ollama_llama_response(combined_context, query)
+        print(f"LLama answer: {llama_answer}")
 
     except Exception as e:
         print(f"Error during vector search or Gemini response generation: {e}")
     
-    return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer)
+    return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer)
 
 def generate_gemini_response(context, query):
     try:
@@ -101,6 +116,28 @@ def generate_gemini_response(context, query):
     except Exception as e:
         # Add error handling
         return f"Error generating response: {str(e)}"
-
+    
+def generate_ollama_llama_response(context, query):
+    try:
+        # Generate response using Ollama Llama
+        data["prompt"] = f"Context: {context}\n\nQuestion: {query}"
+        response = requests.post(url=ollama_url,headers=headers, json=data)
+        
+        if response.status_code == 200:
+            answer = response.json().get("response", "")
+            print(f"LLama response: {answer}")
+            # Clean up the answer (optional based on response format)
+            answer = answer.strip()
+            if not answer:
+                return "No answer found"
+            return answer.strip()
+        else:
+            return f"Error: {response.status_code} - {response.text}"
+  
+    
+    except Exception as e:
+        # Add error handling
+        return f"Error generating response: {str(e)}"
+    
 if __name__ == "__main__":
     app.run(debug=True)
