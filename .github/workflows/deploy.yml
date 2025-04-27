@@ -22,6 +22,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@54.237.97.48 << 'EOF'
           cd ~/flask-cicd || { echo "Failed to change directory"; exit 1; }
+          rm -rf __pycache__/app.cpython-310.pyc
           git pull origin main || { echo "Failed to pull from Git"; exit 1; }
           source venv/bin/activate || { echo "Failed to activate virtual environment"; exit 1; }
           pip install -r requirements.txt || { echo "Failed to install requirements"; exit 1; }
