@@ -144,7 +144,9 @@ def generate_gemini_response(context, query):
 def generate_ollama_llama_response(context, query):
     try:
         # Generate response using Ollama Llama
-        data["prompt"] = f"Context: {context}\n\nQuestion: {query}"
+        instruction = "If the question is not related to the context, say 'I don't know'."
+        data["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
+
         response = requests.post(url=ollama_url, headers=headers, json=data)
         
         if response.status_code == 200:
