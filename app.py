@@ -211,7 +211,7 @@ def generate_ollama_deepseek_response(context, query):
         data1["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
 
         response = requests.post(url=ollama_url, headers=headers, json=data1)
-        
+        print(response)
         if response.status_code == 200:
             answer = response.json().get("response", "").strip()
             return answer if answer else "No answer found"
