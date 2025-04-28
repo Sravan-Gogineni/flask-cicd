@@ -18,9 +18,9 @@
                 <p>{{ gemini_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>ROUGE-1 Score: {% if rogue1_score_gemini == 0 %} No ground truth is available {% else %} {{ rogue1_score }} {% endif %}</p>
-                <p>ROUGE-2 Score: {% if rogue2_score_gemini == 0 %} No ground truth is available {% else %} {{ rogue2_score }} {% endif %}</p>
-                <p>ROUGE-L Score: {% if rogueL_score_gemini == 0 %} No ground truth is available {% else %} {{ rogueL_score }} {% endif %}</p>
+                <p>ROUGE-1 Score: {% if rogue1_score_gemini == 0 %} No ground truth is available {% else %} {{ rogue1_score_gemini }} {% endif %}</p>
+                <p>ROUGE-2 Score: {% if rogue2_score_gemini == 0 %} No ground truth is available {% else %} {{ rogue2_score_gemini}} {% endif %}</p>
+                <p>ROUGE-L Score: {% if rogueL_score_gemini == 0 %} No ground truth is available {% else %} {{ rogueL_score_gemini }} {% endif %}</p>
 
                 <p>BLEU Score: {{ gemini_bleu_score["bleu_score"] }}</p>
             </div>

@@ -138,21 +138,28 @@ def search(query):
         # Evaluate answers using ROUGE and BLEU scores
 
         gemini_rogue_scores = calculate_rouge(query, gemini_answer, ground_truth_answer)
-        rogue1_score_gemini = gemini_rogue_scores['rouge1'].fmeasure
-        rogue2_score_gemini = gemini_rogue_scores['rouge2'].fmeasure
-        rogueL_score_gemini = gemini_rogue_scores['rougeL'].fmeasure
+        if isinstance(gemini_rogue_scores, dict) and "error" in gemini_rogue_scores:
+            rogue1_score_gemini = gemini_rogue_scores['rouge1'].fmeasure
+            rogue2_score_gemini = gemini_rogue_scores['rouge2'].fmeasure
+            rogueL_score_gemini = gemini_rogue_scores['rougeL'].fmeasure
         
         gemini_bleu_score = calculate_bleu_score(query, gemini_answer, ground_truth_answer)
-        llama_rogue_score = calculate_rouge(query, llama_answer, ground_truth_answer)
-        rogue1_score_llama = llama_rogue_score['rouge1'].fmeasure
-        rogue2_score_llama = llama_rogue_score['rouge2'].fmeasure
-        rogueL_score_llama = llama_rogue_score['rougeL'].fmeasure
         
+        llama_rogue_score = calculate_rouge(query, llama_answer, ground_truth_answer)
+        if isinstance(llama_rogue_score, dict) and "error" in llama_rogue_score:
+            rogue1_score_llama = llama_rogue_score['rouge1'].fmeasure
+            rogue2_score_llama = llama_rogue_score['rouge2'].fmeasure
+            rogueL_score_llama = llama_rogue_score['rougeL'].fmeasure
+        
+       
         llama_bleu_score = calculate_bleu_score(query, llama_answer, ground_truth_answer)
+        
+        
         deepseek_rogue_score = calculate_rouge(query, deepseek_answer, ground_truth_answer)
-        rogue1_score_deepseek = deepseek_rogue_score['rouge1'].fmeasure
-        rogue2_score_deepseek = deepseek_rogue_score['rouge2'].fmeasure
-        rogueL_score_deepseek = deepseek_rogue_score['rougeL'].fmeasure
+        if isinstance(deepseek_rogue_score, dict) and "error" in deepseek_rogue_score:
+            rogue1_score_deepseek = deepseek_rogue_score['rouge1'].fmeasure
+            rogue2_score_deepseek = deepseek_rogue_score['rouge2'].fmeasure
+            rogueL_score_deepseek = deepseek_rogue_score['rougeL'].fmeasure
         deepseek_bleu_score = calculate_bleu_score(query, deepseek_answer, ground_truth_answer)
         
         print("Gemini ROUGE scores:", gemini_rogue_scores)
@@ -225,7 +232,8 @@ from rouge_score import rouge_scorer
 
 def calculate_rouge(query, answer, ground_truth_answer):
     # Get the ground truth answer for the query
-    original_answer = ground_truth_answer.get(query)
+    original_answer = ground_truth_answer.get(query) if query in ground_truth_answer else None
+    
     if not original_answer:
         return {"error": "No ground truth answer found"}
 
@@ -244,7 +252,7 @@ def calculate_rouge(query, answer, ground_truth_answer):
 
 # Function to calculate BLEU score
 def calculate_bleu_score(query, answer, ground_truth_answer):
-    original_answer = ground_truth_answer.get(query)
+    original_answer = ground_truth_answer.get(query) if query in ground_truth_answer else None
     if not original_answer:
         return {"error": "No ground truth answer found"}
     
