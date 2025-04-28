@@ -21,7 +21,7 @@
                 <p>rogue1 Score: {{ rogue1_score }}</p>
                 <p>rogue2 Score: {{ rogue2_score }}</p>
                 <p>rogueL Score: {{ rogueL_score }}</p>
-                <p>BLEU Score: {{ gemini_bleu_score }}</p>
+                <p>BLEU Score: {{ gemini_bleu_score["bleu_score"] }}</p>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
                 <p>rogue1 Score: {{ rogue1_score_llama }}</p>
                 <p>rogue2 Score: {{ rogue2_score_llama }}</p>
                 <p>rogueL Score: {{ rogueL_score_llama }}</p>
-                <p>BLEU Score: {{ llama_bleu_score }}</p>
+                <p>BLEU Score: {{ llama_bleu_score["bleu_score"] }}</p>
             </div>
         </div>
         
@@ -51,7 +51,7 @@
                 <p>rogue1 Score: {{ rogue1_score_deepseek }}</p>
                 <p>rogue2 Score: {{ rogue2_score_deepseek }}</p>
                 <p>rogueL Score: {{ rogueL_score_deepseek }}</p>
-                <p>BLEU Score: {{ deepseek_bleu_score }}</p>
+                <p>BLEU Score: {{ deepseek_bleu_score["bleu_score"] }}</p>
             </div>
         </div>
 

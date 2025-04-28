@@ -154,6 +154,7 @@ def search(query):
         rogue2_score_deepseek = deepseek_rogue_score['rouge2'].fmeasure
         rogueL_score_deepseek = deepseek_rogue_score['rougeL'].fmeasure
         deepseek_bleu_score = calculate_bleu_score(query, deepseek_answer, ground_truth_answer)
+        
         print("Gemini ROUGE scores:", gemini_rogue_scores)
 
     except Exception as e:
