@@ -7,6 +7,7 @@ import google.generativeai as genai
 import requests
 import subprocess
 import time
+import psutil  # For checking and terminating processes
 
 # Load environment variables from .env
 load_dotenv()
@@ -97,8 +98,15 @@ def search(query):
         # Start Ollama server if not already running
         ollama_process = subprocess.Popen(["ollama", "serve"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        # Wait for Ollama server to initialize
-        time.sleep(5)  # Wait for Ollama to be ready, adjust if necessary
+        # Wait for Ollama server to initialize with a timeout
+        timeout = 10  # Set a 10-second timeout for Ollama to start
+        for _ in range(timeout):
+            if is_ollama_running():
+                break
+            time.sleep(1)
+        else:
+            print("Ollama server did not start in time, skipping Llama response generation.")
+            return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer="Ollama server timeout.")
 
         # Generate Ollama Llama answer
         llama_answer = generate_ollama_llama_response(combined_context, query)
@@ -112,7 +120,7 @@ def search(query):
         # If Ollama process was started, terminate it after returning the result
         if ollama_process:
             print("Terminating Ollama server...")
-            ollama_process.terminate()
+            terminate_process(ollama_process)
 
     return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer)
 
@@ -159,6 +167,29 @@ def generate_ollama_llama_response(context, query):
     except Exception as e:
         # Add error handling
         return f"Error generating response: {str(e)}"
+
+
+# Check if Ollama server is running (using psutil)
+def is_ollama_running():
+    for proc in psutil.process_iter(attrs=['pid', 'name']):
+        if 'ollama' in proc.info['name'].lower():
+            return True
+    return False
+
+# Terminate the Ollama process
+def terminate_process(process):
+    try:
+        process.terminate()
+        process.wait(timeout=5)  # Wait for it to terminate cleanly
+    except psutil.NoSuchProcess:
+        print("Ollama process already terminated.")
+    except Exception as e:
+        print(f"Error terminating Ollama process: {e}")
+        try:
+            # Forcefully kill the process if terminate does not work
+            process.kill()
+        except Exception as kill_error:
+            print(f"Error killing Ollama process: {kill_error}")
 
 
 if __name__ == "__main__":
