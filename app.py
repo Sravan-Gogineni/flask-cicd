@@ -12,6 +12,7 @@ from rouge_score import rouge_scorer, scoring
 import json
 import logging
 from nltk.translate.bleu_score import sentence_bleu
+from rouge_score import rouge_scorer
 # Load environment variables from .env
 
 load_dotenv()
@@ -208,6 +209,7 @@ def generate_ollama_deepseek_response(context, query):
 
 # Function to calculate ROUGE score
 def calculate_rouge(query, answer, ground_truth_answer):
+    
     original_answer = ground_truth_answer.get(query)
     if not original_answer:
         return {"error": "No ground truth answer found"}
