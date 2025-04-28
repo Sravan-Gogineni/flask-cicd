@@ -30,6 +30,12 @@ data = {
     "stop_sequence": "\n"
 }
 
+data1 = {
+    "model": "deepseek-r1:1.5b",
+    "prompt": "",
+    "stream": False,
+    "stop_sequence": "\n"
+}
 # Init Pinecone
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 index_name = "nlp-research-project"
@@ -70,6 +76,7 @@ def search(query):
 
     gemini_answer = "No answer found"
     llama_answer = "No answer found"
+    deepseek_llama_answer = "No answer found"
     ollama_process = None
 
     try:
@@ -110,13 +117,14 @@ def search(query):
 
         # Generate Ollama Llama answer
         llama_answer = generate_ollama_llama_response(combined_context, query)
+        deepseek_llama_answer = generate_ollama_deepseek_response(combined_context, query)
 
         print(f"Llama answer: {llama_answer}")
 
     except Exception as e:
         print(f"Error during vector search or Gemini response generation: {e}")
 
-    return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer)
+    return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer , deepseek_llama_answer=deepseek_llama_answer)
 
 
 # Helper functions for generating responses
@@ -163,7 +171,29 @@ def generate_ollama_llama_response(context, query):
     except Exception as e:
         # Add error handling
         return f"Error generating response: {str(e)}"
+    
+def generate_ollama_deepseek_response(context, query):
+    try:
+        # Generate response using Ollama Llama
+        instruction = "If the question is not related to the context, say 'I don't know'."
+        data["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
 
+        response = requests.post(url=ollama_url, headers=headers, json=data1)
+        
+        if response.status_code == 200:
+            answer = response.json().get("response", "")
+            print(f"LLama response: {answer}")
+            # Clean up the answer (optional based on response format)
+            answer = answer.strip()
+            if not answer:
+                return "No answer found"
+            return answer.strip()
+        else:
+            return f"Error: {response.status_code} - {response.text}"
+    
+    except Exception as e:
+        # Add error handling
+        return f"Error generating response: {str(e)}"
 
 # Check if Ollama server is running (using psutil)
 def is_ollama_running():
