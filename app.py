@@ -8,8 +8,12 @@ import requests
 import subprocess
 import time
 import psutil  # For checking processes
-
+from rouge_score import rouge_scorer, scoring
+import json
+import logging
+from nltk.translate.bleu_score import sentence_bleu
 # Load environment variables from .env
+
 load_dotenv()
 
 # Flask app init
@@ -60,6 +64,17 @@ gemini_model = genai.GenerativeModel(
     )
 )
 
+ground_truth_answer =  {
+    "Define external fusion and how it is helpful to LLM": "External fusion methods integrate multi-layer visual features at the input stage before feeding visual tokens into the LLMs.",
+    "Different of cohesion phenomena": "Different cohesion phenomena include: 1. Repetition 2. Synonymy 3. Conjunction 4. Ellipsis 4. Substitution 6. Reference.",
+    "Issues with modular, rule-based transformations of linguistic phenomena": "The limitations are Limited Coverage: ,Linguistic Diversity, Dependence on Grammar Systems",
+    "convergence to B-stationarity?": "is a desirable property, it is often established under restrictive assumptions. In particular, if the MPCC linear independence constraint qualification (MPCC-LICQ) holds (i.e., the equality constraints and active inequality constraints in (12) are linearly independent), then B-stationarity is equivalent to S- stationarity ([27]).",
+    "What is TCM?": "TCM is Traditional Chinese Medicine",
+    "What is Part of Speech Tagging": "NLP task that involves labeling each word in a sentence with its part-of-speech,",
+    "What are stress tests? How are they evaluated": "To evaluate the robustness of the selected models when training with the dataset, four of the strategies for stress test generation from (Naik et al., 2018) are used: * Length mismatch: Make the premise a lot longer than the hypothesis, by adding the expression: y verdadero es verdadero y verdadero es verdadero y verdadero es verdadero y verdadero es verdadero y verdadero es verdadero, which does not alter the premise meaning. * Negation: Add negation to the hypothesis without altering the meaning with the expression: y falso no es verdadero. * Overlap: Add the expression: y verdadero es verdadero to the hypothesis to generate a word mismatch between premise and hypothesis. * Spelling: Misspell a word in the premise."
+}
+
+
 # Home page
 @app.route('/')
 def home():
@@ -76,7 +91,7 @@ def search(query):
 
     gemini_answer = "No answer found"
     llama_answer = "No answer found"
-    deepseek_llama_answer = "No answer found"
+    deepseek_answer = "No answer found"
     ollama_process = None
 
     try:
@@ -117,14 +132,24 @@ def search(query):
 
         # Generate Ollama Llama answer
         llama_answer = generate_ollama_llama_response(combined_context, query)
-        deepseek_llama_answer = generate_ollama_deepseek_response(combined_context, query)
+        deepseek_answer = generate_ollama_deepseek_response(combined_context, query)
+        
+        # Evaluate answers using ROUGE and BLEU scores
 
-        print(f"Llama answer: {llama_answer}")
+        gemini_rogue_score = calculate_rouge(query, gemini_answer, ground_truth_answer)
+        gemini_bleu_score = calculate_bleu_score(query, gemini_answer, ground_truth_answer)
+        llama_rogue_score = calculate_rouge(query, llama_answer, ground_truth_answer)
+        llama_bleu_score = calculate_bleu_score(query, llama_answer, ground_truth_answer)
+        deepseek_rogue_score = calculate_rouge(query, deepseek_answer, ground_truth_answer)
+        deepseek_bleu_score = calculate_bleu_score(query, deepseek_answer, ground_truth_answer)
 
     except Exception as e:
         print(f"Error during vector search or Gemini response generation: {e}")
 
-    return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer , deepseek_llama_answer=deepseek_llama_answer)
+    return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer , deepseek_answer=deepseek_answer,
+                           gemini_rogue_score=gemini_rogue_score, gemini_bleu_score=gemini_bleu_score,
+                           llama_rogue_score=llama_rogue_score, llama_bleu_score=llama_bleu_score,
+                           deepseek_rogue_score=deepseek_rogue_score, deepseek_bleu_score=deepseek_bleu_score)
 
 
 # Helper functions for generating responses
@@ -180,6 +205,33 @@ def generate_ollama_deepseek_response(context, query):
     
     except Exception as e:
         return f"Error generating response: {str(e)}"
+
+# Function to calculate ROUGE score
+def calculate_rouge(query, answer, ground_truth_answer):
+    original_answer = ground_truth_answer.get(query)
+    if not original_answer:
+        return {"error": "No ground truth answer found"}
+    
+    scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
+    scores = scorer.score(original_answer, answer)
+    
+    return {metric: scores[metric].fmeasure for metric in scores}
+
+# Function to calculate BLEU score
+def calculate_bleu_score(query, answer, ground_truth_answer):
+    original_answer = ground_truth_answer.get(query)
+    if not original_answer:
+        return {"error": "No ground truth answer found"}
+    
+    # Tokenize the original and generated answers
+    original_answer_tokens = original_answer.split()
+    generated_answer_tokens = answer.split()
+
+    # Calculate BLEU score
+    bleu_score = sentence_bleu([original_answer_tokens], generated_answer_tokens)
+    
+    return {"bleu_score": bleu_score}
+
 
 # Check if Ollama server is running (using psutil)
 def is_ollama_running():

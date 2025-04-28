@@ -17,6 +17,10 @@
             <div class="card-body">
                 <p>{{ gemini_answer }}</p>
             </div>
+            <div class="card-footer">
+                <p>ROUGE Score: {{ gemini_rouge_score }}</p>
+                <p>BLEU Score: {{ gemini_bleu_score }}</p>
+            </div>
         </div>
 
         <div class="card mb-4">
@@ -26,6 +30,10 @@
             <div class="card-body">
                 <p>{{ llama_answer }}</p>
             </div>
+            <div class="card-footer">
+                <p>ROUGE Score: {{ llama_rouge_score }}</p>
+                <p>BLEU Score: {{ llama_bleu_score }}</p>
+            </div>
         </div>
         
         <div class="card mb-4">
@@ -34,6 +42,10 @@
             </div>
             <div class="card-body">
                 <p>{{ deepseek_llama_answer }}</p>
+            </div>
+            <div class="card-footer">
+                <p>ROUGE Score: {{ deepseek_rouge_score }}</p>
+                <p>BLEU Score: {{ deepseek_bleu_score }}</p>
             </div>
         </div>
 
