@@ -207,17 +207,26 @@ def generate_ollama_deepseek_response(context, query):
     except Exception as e:
         return f"Error generating response: {str(e)}"
 
-# Function to calculate ROUGE score
+from rouge_score import rouge_scorer
+
 def calculate_rouge(query, answer, ground_truth_answer):
-    
+    # Get the ground truth answer for the query
     original_answer = ground_truth_answer.get(query)
     if not original_answer:
         return {"error": "No ground truth answer found"}
-    
+
+    # Initialize the ROUGE scorer for rouge1, rouge2, and rougeL
     scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
-    scores = scorer.score(original_answer, answer)
     
+    try:
+        # Calculate ROUGE scores
+        scores = scorer.score(original_answer, answer)
+    except Exception as e:
+        return {"error": f"Error during scoring: {str(e)}"}
+    
+    # Return the F-measure for each ROUGE metric
     return {metric: scores[metric].fmeasure for metric in scores}
+
 
 # Function to calculate BLEU score
 def calculate_bleu_score(query, answer, ground_truth_answer):
