@@ -137,23 +137,35 @@ def search(query):
         
         # Evaluate answers using ROUGE and BLEU scores
 
-        gemini_rogue_score = calculate_rouge(query, gemini_answer, ground_truth_answer)
+        gemini_rogue_scores = calculate_rouge(query, gemini_answer, ground_truth_answer)
+        rogue1_score_gemini = gemini_rogue_scores['rouge1'].fmeasure
+        rogue2_score_gemini = gemini_rogue_scores['rouge2'].fmeasure
+        rogueL_score_gemini = gemini_rogue_scores['rougeL'].fmeasure
+        
         gemini_bleu_score = calculate_bleu_score(query, gemini_answer, ground_truth_answer)
         llama_rogue_score = calculate_rouge(query, llama_answer, ground_truth_answer)
+        rogue1_score_llama = llama_rogue_score['rouge1'].fmeasure
+        rogue2_score_llama = llama_rogue_score['rouge2'].fmeasure
+        rogueL_score_llama = llama_rogue_score['rougeL'].fmeasure
+        
         llama_bleu_score = calculate_bleu_score(query, llama_answer, ground_truth_answer)
         deepseek_rogue_score = calculate_rouge(query, deepseek_answer, ground_truth_answer)
+        rogue1_score_deepseek = deepseek_rogue_score['rouge1'].fmeasure
+        rogue2_score_deepseek = deepseek_rogue_score['rouge2'].fmeasure
+        rogueL_score_deepseek = deepseek_rogue_score['rougeL'].fmeasure
         deepseek_bleu_score = calculate_bleu_score(query, deepseek_answer, ground_truth_answer)
 
     except Exception as e:
         print(f"Error during vector search or Gemini response generation: {e}")
 
     return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer , deepseek_answer=deepseek_answer,
-                           gemini_rogue_score=gemini_rogue_score, gemini_bleu_score=gemini_bleu_score,
-                           llama_rogue_score=llama_rogue_score, llama_bleu_score=llama_bleu_score,
-                           deepseek_rogue_score=deepseek_rogue_score, deepseek_bleu_score=deepseek_bleu_score)
+                           rogue1_score=rogue1_score_gemini, rogue2_score=rogue2_score_gemini, rogueL_score=rogueL_score_gemini,
+                           gemini_bleu_score=gemini_bleu_score, rogue1_score_llama=rogue1_score_llama, rogue2_score_llama=rogue2_score_llama, rogueL_score_llama=rogueL_score_llama,
+                           llama_bleu_score=llama_bleu_score, rogue1_score_deepseek=rogue1_score_deepseek, rogue2_score_deepseek=rogue2_score_deepseek, rogueL_score_deepseek=rogueL_score_deepseek,
+                           deepseek_bleu_score=deepseek_bleu_score)
 
 
-# Helper functions for generating responses
+# Helper functions for generating responses 
 def generate_gemini_response(context, query):
     try:
         # Generate response using Gemini with proper string formatting

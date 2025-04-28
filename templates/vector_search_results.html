@@ -18,7 +18,9 @@
                 <p>{{ gemini_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>ROUGE Score: {{ gemini_rouge_score }}</p>
+                <p>rogue1 Score: {{ rogue1_score }}</p>
+                <p>rogue2 Score: {{ rogue2_score }}</p>
+                <p>rogueL Score: {{ rogueL_score }}</p>
                 <p>BLEU Score: {{ gemini_bleu_score }}</p>
             </div>
         </div>
@@ -31,7 +33,9 @@
                 <p>{{ llama_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>ROUGE Score: {{ llama_rouge_score }}</p>
+                <p>rogue1 Score: {{ rogue1_score_llama }}</p>
+                <p>rogue2 Score: {{ rogue2_score_llama }}</p>
+                <p>rogueL Score: {{ rogueL_score_llama }}</p>
                 <p>BLEU Score: {{ llama_bleu_score }}</p>
             </div>
         </div>
@@ -44,7 +48,9 @@
                 <p>{{ deepseek_llama_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>ROUGE Score: {{ deepseek_rouge_score }}</p>
+                <p>rogue1 Score: {{ rogue1_score_deepseek }}</p>
+                <p>rogue2 Score: {{ rogue2_score_deepseek }}</p>
+                <p>rogueL Score: {{ rogueL_score_deepseek }}</p>
                 <p>BLEU Score: {{ deepseek_bleu_score }}</p>
             </div>
         </div>
