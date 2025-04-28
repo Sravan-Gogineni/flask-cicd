@@ -209,8 +209,6 @@ def generate_ollama_deepseek_response(context, query):
 
 from rouge_score import rouge_scorer
 
-from rouge_score import rouge_scorer
-
 def calculate_rouge(query, answer, ground_truth_answer):
     # Get the ground truth answer for the query
     original_answer = ground_truth_answer.get(query)
@@ -219,32 +217,15 @@ def calculate_rouge(query, answer, ground_truth_answer):
 
     # Initialize the ROUGE scorer for rouge1, rouge2, and rougeL
     scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
-
+    
     try:
         # Calculate ROUGE scores
         scores = scorer.score(original_answer, answer)
-
-        # Return the scores as a dictionary (with precision, recall, fmeasure for each)
-        return {
-            'rouge1': {
-                'precision': round(scores['rouge1'].precision, 4),
-                'recall': round(scores['rouge1'].recall, 4),
-                'fmeasure': round(scores['rouge1'].fmeasure, 4)
-            },
-            'rouge2': {
-                'precision': round(scores['rouge2'].precision, 4),
-                'recall': round(scores['rouge2'].recall, 4),
-                'fmeasure': round(scores['rouge2'].fmeasure, 4)
-            },
-            'rougeL': {
-                'precision': round(scores['rougeL'].precision, 4),
-                'recall': round(scores['rougeL'].recall, 4),
-                'fmeasure': round(scores['rougeL'].fmeasure, 4)
-            }
-        }
-
+        
     except Exception as e:
         return {"error": f"Error during scoring: {str(e)}"}
+    print(scores)
+    return scores
 
 
 # Function to calculate BLEU score
