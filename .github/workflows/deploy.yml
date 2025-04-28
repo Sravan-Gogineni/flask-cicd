@@ -20,7 +20,7 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@54.237.97.48 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ubuntu@3.148.122.62 << 'EOF'
           cd ~/flask-cicd || { echo "Failed to change directory"; exit 1; }
           rm -rf __pycache__/app.cpython-310.pyc
           git pull origin main || { echo "Failed to pull from Git"; exit 1; }
