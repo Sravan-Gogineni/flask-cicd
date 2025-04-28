@@ -46,7 +46,7 @@
                 <h4>deepseek Answer:</h4>
             </div>
             <div class="card-body">
-                <p>{{ deepseek_llama_answer }}</p>
+                <p>{{ deepseek_answer }}</p>
             </div>
             <div class="card-footer">
                 <p>ROUGE-1 Score: {% if rogue1_score_deepseek == 0 %} No ground truth is available {% else %} {{ rogue1_score_deepseek }} {% endif %}</p>
