@@ -18,9 +18,10 @@
                 <p>{{ gemini_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>rogue1 Score: {{ rogue1_score }}</p>
-                <p>rogue2 Score: {{ rogue2_score }}</p>
-                <p>rogueL Score: {{ rogueL_score }}</p>
+                <p>ROUGE-1 Score: {% if rogue1_score_gemini == 0 %} No ground truth is available {% else %} {{ rogue1_score }} {% endif %}</p>
+                <p>ROUGE-2 Score: {% if rogue2_score_gemini == 0 %} No ground truth is available {% else %} {{ rogue2_score }} {% endif %}</p>
+                <p>ROUGE-L Score: {% if rogueL_score_gemini == 0 %} No ground truth is available {% else %} {{ rogueL_score }} {% endif %}</p>
+
                 <p>BLEU Score: {{ gemini_bleu_score["bleu_score"] }}</p>
             </div>
         </div>
@@ -33,9 +34,9 @@
                 <p>{{ llama_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>rogue1 Score: {{ rogue1_score_llama }}</p>
-                <p>rogue2 Score: {{ rogue2_score_llama }}</p>
-                <p>rogueL Score: {{ rogueL_score_llama }}</p>
+                <p>ROUGE-1 Score: {% if rogue1_score_llama == 0 %} No ground truth is available {% else %} {{ rogue1_score_llama }} {% endif %}</p>
+                <p>ROUGE-2 Score: {% if rogue2_score_llama == 0 %} No ground truth is available {% else %} {{ rogue2_score_llama }} {% endif %}</p>
+                <p>ROUGE-L Score: {% if rogueL_score_llama == 0 %} No ground truth is available {% else %} {{ rogueL_score_llama }} {% endif %}</p>
                 <p>BLEU Score: {{ llama_bleu_score["bleu_score"] }}</p>
             </div>
         </div>
@@ -48,9 +49,10 @@
                 <p>{{ deepseek_llama_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>rogue1 Score: {{ rogue1_score_deepseek }}</p>
-                <p>rogue2 Score: {{ rogue2_score_deepseek }}</p>
-                <p>rogueL Score: {{ rogueL_score_deepseek }}</p>
+                <p>ROUGE-1 Score: {% if rogue1_score_deepseek == 0 %} No ground truth is available {% else %} {{ rogue1_score_deepseek }} {% endif %}</p>
+                <p>ROUGE-2 Score: {% if rogue2_score_deepseek == 0 %} No ground truth is available {% else %} {{ rogue2_score_deepseek }} {% endif %}</p>
+                <p>ROUGE-L Score: {% if rogueL_score_deepseek == 0 %} No ground truth is available {% else %} {{ rogueL_score_deepseek }} {% endif %}</p>
+
                 <p>BLEU Score: {{ deepseek_bleu_score["bleu_score"] }}</p>
             </div>
         </div>
