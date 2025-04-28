@@ -172,7 +172,7 @@ def search(query):
         print(f"Error during vector search or Gemini response generation: {e}")
 
     return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer , deepseek_answer=deepseek_answer,
-                           rogue1_score=rogue1_score_gemini, rogue2_score=rogue2_score_gemini, rogueL_score=rogueL_score_gemini,
+                           rogue1_score_gemini=rogue1_score_gemini, rogue2_score_gemini=rogue2_score_gemini, rogueL_score_gemini=rogueL_score_gemini,
                            gemini_bleu_score=gemini_bleu_score, rogue1_score_llama=rogue1_score_llama, rogue2_score_llama=rogue2_score_llama, rogueL_score_llama=rogueL_score_llama,
                            llama_bleu_score=llama_bleu_score, rogue1_score_deepseek=rogue1_score_deepseek, rogue2_score_deepseek=rogue2_score_deepseek, rogueL_score_deepseek=rogueL_score_deepseek,
                            deepseek_bleu_score=deepseek_bleu_score)
