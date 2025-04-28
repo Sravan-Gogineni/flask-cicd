@@ -27,7 +27,7 @@ data = {
 }
 
 # Init Pinecone
-pc = Pinecone(api_key=os.getenv("pinecapikey"))
+pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 index_name = "nlp-research-project"
 
 try:
