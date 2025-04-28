@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 import requests
+import subprocess
+import time
+
 # Load environment variables from .env
 load_dotenv()
 
@@ -65,6 +68,9 @@ def search(query):
         return "Pinecone index is not initialized", 500
 
     gemini_answer = "No answer found"
+    llama_answer = "No answer found"
+    ollama_process = None
+
     try:
         # Get embedding for the query
         query_vector = model.encode(query).tolist()
@@ -87,20 +93,36 @@ def search(query):
 
         # Generate Gemini answer
         gemini_answer = generate_gemini_response(combined_context, query)
+
+        # Start Ollama server if not already running
+        ollama_process = subprocess.Popen(["ollama", "serve"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # Wait for Ollama server to initialize
+        time.sleep(5)  # Wait for Ollama to be ready, adjust if necessary
+
         # Generate Ollama Llama answer
         llama_answer = generate_ollama_llama_response(combined_context, query)
-        print(f"LLama answer: {llama_answer}")
+
+        print(f"Llama answer: {llama_answer}")
 
     except Exception as e:
         print(f"Error during vector search or Gemini response generation: {e}")
-    
+
+    finally:
+        # If Ollama process was started, terminate it after returning the result
+        if ollama_process:
+            print("Terminating Ollama server...")
+            ollama_process.terminate()
+
     return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer)
 
+
+# Helper functions for generating responses
 def generate_gemini_response(context, query):
     try:
         # Generate response using Gemini with proper string formatting
         response = gemini_model.generate_content(f"Context: {context}\n\nQuestion: {query}")
-        answer = response.text # Assuming the response contains a "content" key
+        answer = response.text  # Assuming the response contains a "content" key
         
         if not answer:
             return "No answer found"
@@ -116,12 +138,12 @@ def generate_gemini_response(context, query):
     except Exception as e:
         # Add error handling
         return f"Error generating response: {str(e)}"
-    
+
 def generate_ollama_llama_response(context, query):
     try:
         # Generate response using Ollama Llama
         data["prompt"] = f"Context: {context}\n\nQuestion: {query}"
-        response = requests.post(url=ollama_url,headers=headers, json=data)
+        response = requests.post(url=ollama_url, headers=headers, json=data)
         
         if response.status_code == 200:
             answer = response.json().get("response", "")
@@ -133,11 +155,11 @@ def generate_ollama_llama_response(context, query):
             return answer.strip()
         else:
             return f"Error: {response.status_code} - {response.text}"
-  
     
     except Exception as e:
         # Add error handling
         return f"Error generating response: {str(e)}"
-"abd,dff"
+
+
 if __name__ == "__main__":
     app.run(debug=True)
