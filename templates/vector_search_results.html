@@ -10,6 +10,7 @@
     <div class="container mt-5">
         <h1 class="mb-4">Search Results for: "{{ query }}"</h1>
 
+        <!-- Gemini Answer -->
         <div class="card mb-4">
             <div class="card-header">
                 <h4>Gemini's Answer:</h4>
@@ -18,62 +19,55 @@
                 <p>{{ gemini_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>ROUGE Score: {{ gemini_rouge_score }}</p>
-                <p>BLEU Score: {{ gemini_bleu_score }}</p>
+                <h5>ROUGE Scores:</h5>
+                <ul>
+                    <li><strong>ROUGE-1:</strong> Precision: {{ gemini_rouge_score['rouge1']['precision'] }} | Recall: {{ gemini_rouge_score['rouge1']['recall'] }} | F-measure: {{ gemini_rouge_score['rouge1']['fmeasure'] }}</li>
+                    <li><strong>ROUGE-2:</strong> Precision: {{ gemini_rouge_score['rouge2']['precision'] }} | Recall: {{ gemini_rouge_score['rouge2']['recall'] }} | F-measure: {{ gemini_rouge_score['rouge2']['fmeasure'] }}</li>
+                    <li><strong>ROUGE-L:</strong> Precision: {{ gemini_rouge_score['rougeL']['precision'] }} | Recall: {{ gemini_rouge_score['rougeL']['recall'] }} | F-measure: {{ gemini_rouge_score['rougeL']['fmeasure'] }}</li>
+                </ul>
+                <p><strong>BLEU Score:</strong> {{ gemini_bleu_score }}</p>
             </div>
         </div>
 
+        <!-- Llama Answer -->
         <div class="card mb-4">
             <div class="card-header">
-                <h4>llama Answer:</h4>
+                <h4>Llama Answer:</h4>
             </div>
             <div class="card-body">
                 <p>{{ llama_answer }}</p>
             </div>
             <div class="card-footer">
-                <p>ROUGE Score: {{ llama_rouge_score }}</p>
-                <p>BLEU Score: {{ llama_bleu_score }}</p>
-            </div>
-        </div>
-        
-        <div class="card mb-4">
-            <div class="card-header">
-                <h4>deepseek Answer:</h4>
-            </div>
-            <div class="card-body">
-                <p>{{ deepseek_llama_answer }}</p>
-            </div>
-            <div class="card-footer">
-                <p>ROUGE Score: {{ deepseek_rouge_score }}</p>
-                <p>BLEU Score: {{ deepseek_bleu_score }}</p>
+                <h5>ROUGE Scores:</h5>
+                <ul>
+                    <li><strong>ROUGE-1:</strong> Precision: {{ llama_rouge_score['rouge1']['precision'] }} | Recall: {{ llama_rouge_score['rouge1']['recall'] }} | F-measure: {{ llama_rouge_score['rouge1']['fmeasure'] }}</li>
+                    <li><strong>ROUGE-2:</strong> Precision: {{ llama_rouge_score['rouge2']['precision'] }} | Recall: {{ llama_rouge_score['rouge2']['recall'] }} | F-measure: {{ llama_rouge_score['rouge2']['fmeasure'] }}</li>
+                    <li><strong>ROUGE-L:</strong> Precision: {{ llama_rouge_score['rougeL']['precision'] }} | Recall: {{ llama_rouge_score['rougeL']['recall'] }} | F-measure: {{ llama_rouge_score['rougeL']['fmeasure'] }}</li>
+                </ul>
+                <p><strong>BLEU Score:</strong> {{ llama_bleu_score }}</p>
             </div>
         </div>
 
-        <!-- 
-        <h3>Top Vector Search Results:</h3>
-        {% if results %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Text</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ result.text }}</td>
-                            <td>{{ result.score }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No results found for your query.</p>
-        {% endif %}
-        -->
+        <!-- Deepseek Answer -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Deepseek Answer:</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ deepseek_answer }}</p>
+            </div>
+            <div class="card-footer">
+                <h5>ROUGE Scores:</h5>
+                <ul>
+                    <li><strong>ROUGE-1:</strong> Precision: {{ deepseek_rouge_score['rouge1']['precision'] }} | Recall: {{ deepseek_rouge_score['rouge1']['recall'] }} | F-measure: {{ deepseek_rouge_score['rouge1']['fmeasure'] }}</li>
+                    <li><strong>ROUGE-2:</strong> Precision: {{ deepseek_rouge_score['rouge2']['precision'] }} | Recall: {{ deepseek_rouge_score['rouge2']['recall'] }} | F-measure: {{ deepseek_rouge_score['rouge2']['fmeasure'] }}</li>
+                    <li><strong>ROUGE-L:</strong> Precision: {{ deepseek_rouge_score['rougeL']['precision'] }} | Recall: {{ deepseek_rouge_score['rougeL']['recall'] }} | F-measure: {{ deepseek_rouge_score['rougeL']['fmeasure'] }}</li>
+                </ul>
+                <p><strong>BLEU Score:</strong> {{ deepseek_bleu_score }}</p>
+            </div>
+        </div>
+
+        <!-- Back Button -->
         <a href="/" class="btn btn-primary mt-4">Back to Home</a>
     </div>
 
