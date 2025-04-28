@@ -7,7 +7,7 @@ import google.generativeai as genai
 import requests
 import subprocess
 import time
-import psutil  # For checking and terminating processes
+import psutil  # For checking processes
 
 # Load environment variables from .env
 load_dotenv()
@@ -116,12 +116,6 @@ def search(query):
     except Exception as e:
         print(f"Error during vector search or Gemini response generation: {e}")
 
-    finally:
-        # If Ollama process was started, terminate it after returning the result
-        if ollama_process:
-            print("Terminating Ollama server...")
-            terminate_process(ollama_process)
-
     return render_template('vector_search_results.html', query=query, results=vector_chunks, gemini_answer=gemini_answer, llama_answer=llama_answer)
 
 
@@ -175,22 +169,6 @@ def is_ollama_running():
         if 'ollama' in proc.info['name'].lower():
             return True
     return False
-
-# Terminate the Ollama process
-def terminate_process(process):
-    try:
-        process.terminate()
-        process.wait(timeout=5)  # Wait for it to terminate cleanly
-    except psutil.NoSuchProcess:
-        print("Ollama process already terminated.")
-    except Exception as e:
-        print(f"Error terminating Ollama process: {e}")
-        try:
-            # Forcefully kill the process if terminate does not work
-            process.kill()
-        except Exception as kill_error:
-            print(f"Error killing Ollama process: {kill_error}")
-"vsdddfdd"
 
 if __name__ == "__main__":
     app.run(debug=True)
