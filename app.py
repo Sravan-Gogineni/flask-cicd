@@ -190,7 +190,7 @@ def terminate_process(process):
             process.kill()
         except Exception as kill_error:
             print(f"Error killing Ollama process: {kill_error}")
-"vsddddd"
+"vsdddffdd"
 
 if __name__ == "__main__":
     app.run(debug=True)
