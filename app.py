@@ -223,8 +223,7 @@ def calculate_rouge(query, answer, ground_truth_answer):
         scores = scorer.score(original_answer, answer)
     except Exception as e:
         return {"error": f"Error during scoring: {str(e)}"}
-    
-    # Return the F-measure for each ROUGE metric
+    print(scores)
     return {metric: scores[metric].fmeasure for metric in scores}
 
 
