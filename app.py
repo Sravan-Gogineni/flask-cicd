@@ -8,13 +8,12 @@ import requests
 import subprocess
 import time
 import psutil  # For checking processes
-from rouge_score import rouge_scorer, scoring
-import json
-import logging
-from nltk.translate.bleu_score import sentence_bleu
 from rouge_score import rouge_scorer
-# Load environment variables from .env
+from nltk.translate.bleu_score import sentence_bleu
+import logging
+import json
 
+# Load environment variables from .env
 load_dotenv()
 
 # Flask app init
@@ -28,6 +27,7 @@ headers = {
     "Content-Type": "application/json",
     "Accept": "application/json"
 }
+
 data = {
     "model": "llama3",
     "prompt": "",
@@ -41,6 +41,7 @@ data1 = {
     "stream": False,
     "stop_sequence": "\n"
 }
+
 # Init Pinecone
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 index_name = "nlp-research-project"
@@ -65,16 +66,15 @@ gemini_model = genai.GenerativeModel(
     )
 )
 
-ground_truth_answer =  {
+ground_truth_answer = {
     "Define external fusion and how it is helpful to LLM": "External fusion methods integrate multi-layer visual features at the input stage before feeding visual tokens into the LLMs.",
     "Different of cohesion phenomena": "Different cohesion phenomena include: 1. Repetition 2. Synonymy 3. Conjunction 4. Ellipsis 4. Substitution 6. Reference.",
     "Issues with modular, rule-based transformations of linguistic phenomena": "The limitations are Limited Coverage: ,Linguistic Diversity, Dependence on Grammar Systems",
     "convergence to B-stationarity?": "is a desirable property, it is often established under restrictive assumptions. In particular, if the MPCC linear independence constraint qualification (MPCC-LICQ) holds (i.e., the equality constraints and active inequality constraints in (12) are linearly independent), then B-stationarity is equivalent to S- stationarity ([27]).",
     "What is TCM?": "TCM is Traditional Chinese Medicine",
-    "What is Part of Speech Tagging": "NLP task that involves labeling each word in a sentence with its part-of-speech,",
+    "What is Part of Speech Tagging": "NLP task that involves labeling each word in a sentence with its part-of-speech.",
     "What are stress tests? How are they evaluated": "To evaluate the robustness of the selected models when training with the dataset, four of the strategies for stress test generation from (Naik et al., 2018) are used: * Length mismatch: Make the premise a lot longer than the hypothesis, by adding the expression: y verdadero es verdadero y verdadero es verdadero y verdadero es verdadero y verdadero es verdadero y verdadero es verdadero, which does not alter the premise meaning. * Negation: Add negation to the hypothesis without altering the meaning with the expression: y falso no es verdadero. * Overlap: Add the expression: y verdadero es verdadero to the hypothesis to generate a word mismatch between premise and hypothesis. * Spelling: Misspell a word in the premise."
 }
-
 
 # Home page
 @app.route('/')
@@ -136,32 +136,36 @@ def search(query):
         deepseek_answer = generate_ollama_deepseek_response(combined_context, query)
         
         # Evaluate answers using ROUGE and BLEU scores
-
         gemini_rogue_scores = calculate_rouge(query, gemini_answer, ground_truth_answer)
-        if isinstance(gemini_rogue_scores, dict) and "error" in gemini_rogue_scores:
+        if isinstance(gemini_rogue_scores, dict) and "error" not in gemini_rogue_scores:
             rogue1_score_gemini = gemini_rogue_scores['rouge1'].fmeasure
             rogue2_score_gemini = gemini_rogue_scores['rouge2'].fmeasure
             rogueL_score_gemini = gemini_rogue_scores['rougeL'].fmeasure
-        
+        else:
+            rogue1_score_gemini = rogue2_score_gemini = rogueL_score_gemini = "Error"
+
         gemini_bleu_score = calculate_bleu_score(query, gemini_answer, ground_truth_answer)
         
         llama_rogue_score = calculate_rouge(query, llama_answer, ground_truth_answer)
-        if isinstance(llama_rogue_score, dict) and "error" in llama_rogue_score:
+        if isinstance(llama_rogue_score, dict) and "error" not in llama_rogue_score:
             rogue1_score_llama = llama_rogue_score['rouge1'].fmeasure
             rogue2_score_llama = llama_rogue_score['rouge2'].fmeasure
             rogueL_score_llama = llama_rogue_score['rougeL'].fmeasure
+        else:
+            rogue1_score_llama = rogue2_score_llama = rogueL_score_llama = "Error"
         
-       
         llama_bleu_score = calculate_bleu_score(query, llama_answer, ground_truth_answer)
         
-        
         deepseek_rogue_score = calculate_rouge(query, deepseek_answer, ground_truth_answer)
-        if isinstance(deepseek_rogue_score, dict) and "error" in deepseek_rogue_score:
+        if isinstance(deepseek_rogue_score, dict) and "error" not in deepseek_rogue_score:
             rogue1_score_deepseek = deepseek_rogue_score['rouge1'].fmeasure
             rogue2_score_deepseek = deepseek_rogue_score['rouge2'].fmeasure
             rogueL_score_deepseek = deepseek_rogue_score['rougeL'].fmeasure
+        else:
+            rogue1_score_deepseek = rogue2_score_deepseek = rogueL_score_deepseek = "Error"
+
         deepseek_bleu_score = calculate_bleu_score(query, deepseek_answer, ground_truth_answer)
-        
+
         print("Gemini ROUGE scores:", gemini_rogue_scores)
 
     except Exception as e:
@@ -218,7 +222,6 @@ def generate_ollama_deepseek_response(context, query):
         data1["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
 
         response = requests.post(url=ollama_url, headers=headers, json=data1)
-        print(response)
         if response.status_code == 200:
             answer = response.json().get("response", "").strip()
             return answer if answer else "No answer found"
@@ -228,45 +231,35 @@ def generate_ollama_deepseek_response(context, query):
     except Exception as e:
         return f"Error generating response: {str(e)}"
 
-from rouge_score import rouge_scorer
-
 def calculate_rouge(query, answer, ground_truth_answer):
-    # Get the ground truth answer for the query
     original_answer = ground_truth_answer.get(query) if query in ground_truth_answer else None
     
     if not original_answer:
         return {"error": "No ground truth answer found"}
 
-    # Initialize the ROUGE scorer for rouge1, rouge2, and rougeL
     scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
     
     try:
-        # Calculate ROUGE scores
         scores = scorer.score(original_answer, answer)
-        
     except Exception as e:
         return {"error": f"Error during scoring: {str(e)}"}
-    print(scores)
+
     return scores
 
 
-# Function to calculate BLEU score
 def calculate_bleu_score(query, answer, ground_truth_answer):
     original_answer = ground_truth_answer.get(query) if query in ground_truth_answer else None
     if not original_answer:
         return {"error": "No ground truth answer found"}
     
-    # Tokenize the original and generated answers
     original_answer_tokens = original_answer.split()
     generated_answer_tokens = answer.split()
 
-    # Calculate BLEU score
     bleu_score = sentence_bleu([original_answer_tokens], generated_answer_tokens)
     
     return {"bleu_score": bleu_score}
 
 
-# Check if Ollama server is running (using psutil)
 def is_ollama_running():
     for proc in psutil.process_iter(attrs=['pid', 'name']):
         if 'ollama' in proc.info['name'].lower():
