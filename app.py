@@ -151,48 +151,34 @@ def generate_gemini_response(context, query):
 
 def generate_ollama_llama_response(context, query):
     try:
-        # Generate response using Ollama Llama
         instruction = "If the question is not related to the context, say 'I don't know'."
         data["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
 
         response = requests.post(url=ollama_url, headers=headers, json=data)
         
         if response.status_code == 200:
-            answer = response.json().get("response", "")
-            print(f"LLama response: {answer}")
-            # Clean up the answer (optional based on response format)
-            answer = answer.strip()
-            if not answer:
-                return "No answer found"
-            return answer.strip()
+            answer = response.json().get("response", "").strip()
+            return answer if answer else "No answer found"
         else:
             return f"Error: {response.status_code} - {response.text}"
     
     except Exception as e:
-        # Add error handling
         return f"Error generating response: {str(e)}"
     
 def generate_ollama_deepseek_response(context, query):
     try:
-        # Generate response using Ollama Llama
         instruction = "If the question is not related to the context, say 'I don't know'."
-        data["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
+        data1["prompt"] = f"{instruction}\nContext: {context}\n\nQuestion: {query}"
 
         response = requests.post(url=ollama_url, headers=headers, json=data1)
         
         if response.status_code == 200:
-            answer = response.json().get("response", "")
-            print(f"LLama response: {answer}")
-            # Clean up the answer (optional based on response format)
-            answer = answer.strip()
-            if not answer:
-                return "No answer found"
-            return answer.strip()
+            answer = response.json().get("response", "").strip()
+            return answer if answer else "No answer found"
         else:
             return f"Error: {response.status_code} - {response.text}"
     
     except Exception as e:
-        # Add error handling
         return f"Error generating response: {str(e)}"
 
 # Check if Ollama server is running (using psutil)
