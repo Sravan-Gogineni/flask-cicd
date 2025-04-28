@@ -224,7 +224,7 @@ def calculate_rouge(query, answer, ground_truth_answer):
     except Exception as e:
         return {"error": f"Error during scoring: {str(e)}"}
     print(scores)
-    return {metric: scores[metric].fmeasure for metric in scores}
+    return scores
 
 
 # Function to calculate BLEU score
